@@ -1,4 +1,3 @@
-import './App.css';
 import FilterPart from './components/FilterPart/FilterPart';
 import LabelPart from './components/LabelPart/LabelPart';
 import Home from './components/Home/Home';
