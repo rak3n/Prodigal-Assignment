@@ -1,5 +1,8 @@
 
 const Home = () =>{
+    /** 
+     * Static Home compponent for introduction
+     */
     return (
         <div style={{display:'flex', flexDirection:'column', textAlign:'left', padding:20}}>
             <h1 style={{textAlign:'center'}}>Prodigal Frontend Assingment</h1>

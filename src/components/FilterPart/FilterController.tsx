@@ -11,9 +11,9 @@ interface FilterControllerInterface{
 }
 
 const FilterController: React.FC<FilterControllerInterface> = ({setTableData}):JSX.Element =>{
-    const [allAgents, setAllAgents] = useState([]);
-    const [agentName, setAgentName] = useState<string>('');
-    const [selectAgents, setSelectAgents] = useState<Array<string>>([]);
+    const [allAgents, setAllAgents] = useState([]); //name of all agents
+    const [agentName, setAgentName] = useState<string>(''); // current typed agents name.
+    const [selectAgents, setSelectAgents] = useState<Array<string>>([]);//list of selected agents from dropdown.
     const [duration, setDuration] = useState({
         min: 0,
         max:10000,
@@ -22,6 +22,7 @@ const FilterController: React.FC<FilterControllerInterface> = ({setTableData}):J
     var slectedDuration:Array<number> = [duration.min, duration.max];
 
     const makeReqForAgents = async () => {
+        // get all agents list.
         await axios({
             url: Part1.listAgents,
             method:'GET',
@@ -36,6 +37,7 @@ const FilterController: React.FC<FilterControllerInterface> = ({setTableData}):J
     }
 
     const makeReqForDuration = async()=>{
+        //get Call durations (max and min)
         await axios({
             url: Part1.durationRange,
             method:'GET',
@@ -50,6 +52,7 @@ const FilterController: React.FC<FilterControllerInterface> = ({setTableData}):J
     }
 
     useEffect(()=>{
+        //calls made once after mounting
         makeReqForAgents();
         makeReqForDuration();
     },[]);
@@ -60,12 +63,14 @@ const FilterController: React.FC<FilterControllerInterface> = ({setTableData}):J
     }
 
     const renderList = selectAgents.map((itm, idx) => {
+        //rendering the selected agents list.
         return (
             <Tag closable onClose={()=>removeAgent(itm)}>{itm}</Tag>
         );
     })
 
     const selectAgent = (e:any) =>{
+        //select the agents without allowing repeatition
         var filter = selectAgents.filter(itm=>itm === e ? true : false);
         if(filter.length===0)
             setSelectAgents([...selectAgents, e]);
@@ -73,6 +78,7 @@ const FilterController: React.FC<FilterControllerInterface> = ({setTableData}):J
     }
 
     const durationChange=(e:Array<number>)=>{
+        //Set duration of calls filter value.
         slectedDuration=e;
     }
 

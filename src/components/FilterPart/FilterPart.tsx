@@ -33,8 +33,9 @@ const FilterPart:React.FC = ():JSX.Element =>{
     const [tableData, setTableData] = useState<Array<tableObj>>([]);
 
     const updateTable = (data:any) =>{
+      // Update the data inside table via state lifting
         if(data){
-            console.log(data);
+            // console.log(data);
             setTableData([...data]);
         }
     }

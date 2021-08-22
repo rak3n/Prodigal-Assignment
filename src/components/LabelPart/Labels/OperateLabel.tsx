@@ -38,38 +38,47 @@ var deleteMap= new Map(); // A container to hold all deleted labels
 var addContainer:string[] = []; // Container for all other labels which are added and not common in slection.
 
 const OperateLabel:React.FC<OperateLabelInterface> = ({data, goBack, refresh}) =>{
-    const [label, setLabel] = React.useState<string>('');
-    const [allLabels, setAllLabels] = React.useState<Array<autoComplete>>([]);
-    const [selectedLables, setSelectedLables] = React.useState<Array<string>>([]);
+    // Component to manage Operation like remove, create and add labels, on selected data.
+    const [label, setLabel] = React.useState<string>(''); //Current Label Typed
+    const [allLabels, setAllLabels] = React.useState<Array<autoComplete>>([]); //All the available fetched from API
+    const [selectedLables, setSelectedLables] = React.useState<Array<string>>([]); //List of selected labels to render in box
     
     const removeAgent = (agent:string) =>{
+        // Remove Label
         console.log(selectedLables);
         var data = selectedLables.filter((itm:string)=> itm!==agent );
         console.log(data);
         setSelectedLables(data);
         if(deleteMap.has(agent)){
+            //If label exist in common and deleted then add remove operation in API
             deleteMap.set(agent, true);
         }
         else{
+            //Else the label exist in other container so remove it from add operation.
             addContainer = addContainer.filter((itm:string)=>itm !== agent);
         }
     };
 
     const renderList = selectedLables.map((itm: string) => {
+        //Rendering the list of slected tags.
         return (
             <Tag key ={itm} closable onClose={()=>removeAgent(itm)}>{itm}</Tag>
         );
     });
 
     const selectLabel = (label: string) => {
+        //Adding labels to the slectedLables list
         setLabel('');
         if(deleteMap.has(label)){
+            //If we are adding label that has been deleted than nullify from delete labels container. 
             deleteMap.set(label, false);
         }
         else{
-            addContainer = [...addContainer, label];
+            //else add the label to the add operations container.
+            addContainer = [...new Set([...addContainer, label])];
         }
-        console.log(addContainer, deleteMap);
+        // console.log(addContainer, deleteMap);
+        //Don't allow common labels to render.
         var filter = selectedLables.filter((itm:string)=>itm === label ? true : false);
         if(filter.length===0)
             setSelectedLables([...selectedLables, label]);
@@ -94,20 +103,25 @@ const OperateLabel:React.FC<OperateLabelInterface> = ({data, goBack, refresh}) =
 
     const makeOperateLabelsReq = async () =>{
         var ops:operationType[] = [];
+        //Flatten the delte container with remove operation for API.
         [...Object(deleteMap).keys()].forEach((itm:string) => {
             if(deleteMap.get(itm)){
                 ops = [...ops, {name: itm, "op":"remove"}];
             }
         });
+        //Same for all add opearions.
         addContainer.forEach(itm=>{
                 ops = [...ops,{
                     name: itm,
                     "op": "add",
                 }];
         });
+
+        //Prepare the Call List for API from available data.
         var callList = data.map(itm=>itm.key);
 
-        console.log(callList,ops);
+        // console.log(callList,ops);
+        //Make the API call.
         if(ops.length){
         await axios({
             method:'POST',
@@ -132,6 +146,7 @@ const OperateLabel:React.FC<OperateLabelInterface> = ({data, goBack, refresh}) =
     }
 
     const setIntersection = (a:string[][]):string[] => {
+        //To find all common items from the list of strings[]
         var m = new Map(),
             r = new Set(),
             l = a.length;
@@ -144,22 +159,27 @@ const OperateLabel:React.FC<OperateLabelInterface> = ({data, goBack, refresh}) =
     React.useEffect(()=>{
         getAvailableLabels();
         var allLabels:string[][] = [];
+        // Add all labels to a container
         data.forEach(itm=>{
             allLabels=[...allLabels, itm.label_id]
         });
+        //Get common labels
         var commonLabels:string[] = setIntersection(allLabels);
         commonLabels.forEach(itm=>{
             deleteMap.set(itm, false);
         })
+        //set the commmon labels as selected.
         setSelectedLables(commonLabels);
 
         return ()=>{
+            //on component unmount reset both the container for next action call.
             addContainer=[];
             deleteMap.clear();
         }
     },[]);
 
     const generateOptions = () =>{
+        // generate options for adding of labels, if it doesn't exist in list.
         if(!label.length){
             return allLabels;
         }

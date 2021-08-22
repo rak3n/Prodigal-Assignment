@@ -30,8 +30,11 @@ const columns = [
 export type {tableObj};
 
 const LabelController:React.FC<LabelControllerInterface> = ({data, goBack, refresh}):JSX.Element =>{
-    const [selected, setSelected] = useState<Array<tableObj>>([]);
-    const [step, setStep] = useState< 1 | 2 >(1);
+  /*
+  Pop Up components to operate on labels
+  */
+    const [selected, setSelected] = useState<Array<tableObj>>([]); //List of all selected rows from step 1. 
+    const [step, setStep] = useState< 1 | 2 >(1); //Define the step user is avaliable at in the PopUp
 
     const rowSelection = {
         selectedRowsKeys:[],
@@ -45,7 +48,7 @@ const LabelController:React.FC<LabelControllerInterface> = ({data, goBack, refre
 
     return (
         <div style={{position:'fixed', zIndex:200, backgroundColor:'rgba(0,0,0,0.5)', top:0, left:0, right:0, bottom:0, display:'flex', justifyContent:'center', alignItems:'center'}}>
-            <div style={{backgroundColor:'white', borderRadius:4, width:'90%', padding:20, height:'90%', overflow:'auto'}}>
+            <div style={{backgroundColor:'white', borderRadius:4, width:'90%', textAlign:'center', alignItems:'center', padding:20, height:'90%', overflow:'auto'}}>
               {
                 step===1?
                   <>
